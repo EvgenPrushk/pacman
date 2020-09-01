@@ -1,4 +1,4 @@
-export function loadImage (src) {
+export function loadImage(src) {
     return new Promise((resolve, reject) => {
         const image = new Image;
         image.src = src;
@@ -7,7 +7,7 @@ export function loadImage (src) {
     })
 }
 
-export function loadJSON (src) {
+export function loadJSON(src) {
     return fetch(src).then(x => x.json())
 }
 
