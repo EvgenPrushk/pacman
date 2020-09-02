@@ -9,6 +9,10 @@ export default class DisplayObject {
         this.height = props.height ?? 0
     }
 
+    update() {
+
+    }
+
     draw() {
 
     }

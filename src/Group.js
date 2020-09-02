@@ -22,11 +22,11 @@ export default class Group extends DisplayObject {
         }
     }
 
-    update() {
-
+    update(delta) {
+        this.items.forEach(x => x.update(delta));
     }
 
     draw(context) {
-        this.items.forEach(x => x.draw(context))
+        this.items.forEach(x => x.draw(context));
     }
 }

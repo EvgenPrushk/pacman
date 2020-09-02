@@ -10,6 +10,8 @@ export default class Game {
         this.canvas.height = props.height ?? 50;
         this.background = props.background ?? 'black';
 
+
+        this.pTimesstamp = 0;
         requestAnimationFrame(x => this.render(x));
     }
 
@@ -26,6 +28,11 @@ export default class Game {
 
     render(timestamp) {
         requestAnimationFrame(x => this.render(x));
+        const delta = timestamp - this.pTimesstamp;
+        this.pTimesstamp = timestamp;
+
+        this.stage.update(delta);
+
 
         this.clearCanvas();
         this.drawBackground();

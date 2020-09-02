@@ -17,14 +17,14 @@ export default async function main() {
 
     const image = await loadImage('/sets/spritesheet.png');
     const atlas = await loadJSON('/sets/atlas.json');
-    
+
     // const  maze = new Sprite({
     //     image,
     //     x: 0,
     //     y: 0,
     //     width: 224,
     //     height: 255,
-        
+
     //     frame: {
     //     x: 0,
     //     y: 0,
@@ -41,13 +41,14 @@ export default async function main() {
         image,
         x: 100,
         y: 100,
-        width: 16,
-        height: 16,
+        width: 50,
+        height: 50,
         animations: atlas.pacman,
+        debug: true,
     })
 
-    pacman.start('left');
-    console.log(pacman);
+    pacman.start('right');
+    game.stage.add(pacman);
 
 
 }
