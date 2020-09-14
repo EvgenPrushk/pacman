@@ -7,10 +7,13 @@ export default class Sprite extends DisplayObject {
         this.image = props.image ?? null;
         this.frame = props.frame ?? null;
         this.debug = props.debug ?? false;
+        this.speedX = props.speedX ?? 0;
+        this.speedY = props.speedY ?? 0;
     }
 
     update () {
-        
+        this.x += this.speedX;
+        this.y += this.speedY;
     }
 
     draw (context) {
@@ -27,7 +30,7 @@ export default class Sprite extends DisplayObject {
             this.width,
             this.height,          
     
-        )
+        );
 
         if (this.debug) {
             context.beginPath();

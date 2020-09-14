@@ -87,7 +87,8 @@ export default async function main() {
         width: 13 * scale,
         height: 13 * scale,
         animations: atlas.pacman,
-       debug: true,
+      // debug: true,
+       speedX: 1,
     });
     pacman.start('right');
 
@@ -114,7 +115,26 @@ export default async function main() {
     // вызов через массив
     ghosts.forEach(ghost => game.stage.add(ghost));
     
-
+    document.addEventListener('keydown', event => {
+        if (event.key === 'ArrowLeft'){
+            pacman.start('left');
+            pacman.speedX = - 1;
+            pacman.speedY = 0;
+        } else if (event.key === 'ArrowRight'){
+            pacman.start('right');
+            pacman.speedX = 1;
+            pacman.speedY = 0;
+        } else if (event.key === 'ArrowUp'){
+            pacman.start('up');
+            pacman.speedX = 0;
+            pacman.speedY = -1;
+            
+        } else if (event.key === 'ArrowDown'){
+            pacman.start('down');
+            pacman.speedX = 0;
+            pacman.speedY = 1;
+        }
+    });
    
 
 
