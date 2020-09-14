@@ -40,6 +40,11 @@ export default class Sprite extends DisplayObject {
             context.lineWidt = 3;
             context.strokeStyle = 'green';
             context.stroke();
+
+            context.beginPath();
+            context.moveTo(this.x, this.y);
+            context.lineTo(this.x + this.width, this.y + this.height);
+            context.stroke();
         }
     }
     
