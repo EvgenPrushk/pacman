@@ -15,6 +15,10 @@ export default class Game {
         requestAnimationFrame(x => this.render(x));
     }
 
+    update(){
+        
+    };
+
     clearCanvas() {
         this.canvas.width = this.canvas.width;
     }
@@ -31,6 +35,7 @@ export default class Game {
         const delta = timestamp - this.pTimesstamp;
         this.pTimesstamp = timestamp;
 
+        this.update();
         this.stage.update(delta);
 
 
