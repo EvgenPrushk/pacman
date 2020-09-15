@@ -9,12 +9,23 @@ export default class Sprite extends DisplayObject {
        
         this.speedX = props.speedX ?? 0;
         this.speedY = props.speedY ?? 0;
+        this.nextDirection = null;
+    };
+
+    getNextPosition() {
+        return {
+            x: this.x + this.speedX,
+            y: this.y + this.speedY,            
+            height: this.height,
+            width: this.width,
+        }
     }
+
 
     update () {
         this.x += this.speedX;
         this.y += this.speedY;
-    }
+    };
 
     draw (context) {
         context.drawImage(

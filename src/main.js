@@ -58,7 +58,7 @@ export default async function main() {
         width: 13 * scale,
         height: 13 * scale,
         animations: atlas.pacman,
-        // debug: true,
+         debug: true,
         speedX: 1,
     });
     pacman.start('right');
@@ -83,7 +83,7 @@ export default async function main() {
     const walls = atlas.maze.walls.map(wall => new DisplayObject({
         // передача всех wall
         x: wall.x * scale,
-        y: wall.y * scale,
+        y: wall.y *  scale,
         width: wall.width * scale,
         height: wall.height * scale,
         debug: true,
@@ -107,31 +107,81 @@ export default async function main() {
         };
         // оставляем ту еду, которую не съел pacman
         foods = foods.filter(food => !eated.includes(food));
+
+       changeDirection(pacman);
+
+        const wall = getWallCollition(pacman.getNextPosition());
+        if (wall) {
+            pacman.start(`wait${pacman.animation.name}`);s
+            pacman.speedX = 0;
+            pacman.speedY = 0;
+
+        } 
     };
 
     document.addEventListener('keydown', event => {
         if (event.key === 'ArrowLeft') {
-            pacman.start('left');
-            pacman.speedX = - 1;
-            pacman.speedY = 0;
+            pacman.nextDirection = 'left';
         } else if (event.key === 'ArrowRight') {
-            pacman.start('right');
-            pacman.speedX = 1;
-            pacman.speedY = 0;
+            pacman.nextDirection = 'right';
         } else if (event.key === 'ArrowUp') {
-            pacman.start('up');
-            pacman.speedX = 0;
-            pacman.speedY = -1;
-
+            pacman.nextDirection = 'up';
         } else if (event.key === 'ArrowDown') {
-            pacman.start('down');
-            pacman.speedX = 0;
-            pacman.speedY = 1;
+            pacman.nextDirection = 'down';
         }
     });
 
 
-    function getWallCollition() {
-        
+    function getWallCollition(obj) {
+        for (const wall of walls) {
+            if (haveCollision(wall, obj)) {
+                return wall;
+            }
+        }
+        return null;
+    }
+
+    function changeDirection(sprite) {
+        if (!sprite.nextDirection) {
+            return;
+        }
+        if (sprite.nextDirection === 'up') {
+            sprite.y -= 10;
+            if (!getWallCollition(sprite)) {
+                sprite.nextDirection = null;
+                sprite.speedX = 0;
+                sprite.speedY = -1;
+                sprite.start('up');
+            }
+            sprite.y += 10;
+        } else if (sprite.nextDirection === 'down') {
+            sprite.y += 10;
+            if (!getWallCollition(sprite)) {
+                sprite.nextDirection = null;
+                sprite.speedX = 0;
+                sprite.speedY = 1;
+                sprite.start('down');
+            }
+            sprite.y -= 10;
+        } else if (sprite.nextDirection === 'left') {
+            sprite.x -= 10;
+            if (!getWallCollition(sprite)) {
+                sprite.nextDirection = null;
+                sprite.speedX = -1;
+                sprite.speedY = 0;
+                sprite.start('left');
+            }
+            sprite.x += 10;
+        } else if (sprite.nextDirection === 'right') {
+            sprite.x += 10;
+            if (!getWallCollition(sprite)) {
+                sprite.nextDirection = null;
+                sprite.speedX = 1;
+                sprite.speedY = 0;
+                sprite.start('right');
+            }
+            sprite.x -= 10;
+        }
+
     }
 }
