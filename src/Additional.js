@@ -28,4 +28,8 @@ export function haveCollision (a, b) {
 
     return false;
 
-};
+}
+
+export function getRandomFrom(...aray) {
+    const index = Math.floor(Math.random() * aray.length);
+}

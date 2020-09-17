@@ -39,7 +39,7 @@ export default class Sprite extends DisplayObject {
             this.x,
             this.y,
             this.width,
-            this.height,          
+            this.height          
     
         );
 

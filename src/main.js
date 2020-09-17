@@ -1,8 +1,13 @@
 import Game from './Game.js';
-import { loadImage, loadJSON } from './Loader.js';
+import {
+    loadImage,
+    loadJSON
+} from './Loader.js';
 import Sprite from './Sprite.js';
 import Cinematic from './Cinematic.js';
-import { haveCollision } from './Additional.js';
+import {
+    haveCollision
+} from './Additional.js';
 import DisplayObject from './DisplayObject.js';
 
 const scale = 3;
@@ -58,7 +63,7 @@ export default async function main() {
         width: 13 * scale,
         height: 13 * scale,
         animations: atlas.pacman,
-         debug: true,
+        debug: true,
         speedX: 1,
     });
     pacman.start('right');
@@ -77,17 +82,18 @@ export default async function main() {
             });
             // позиция задает по цвету
             ghost.start(atlas.position[color].direction);
+            ghost.nextDirection = atlas.position[color].direction;
             return ghost;
         });
-    
+
     const walls = atlas.maze.walls.map(wall => new DisplayObject({
         // передача всех wall
         x: wall.x * scale,
-        y: wall.y *  scale,
+        y: wall.y * scale,
         width: wall.width * scale,
         height: wall.height * scale,
         debug: true,
-        }));
+    }));
 
 
     game.stage.add(maze);
@@ -99,24 +105,38 @@ export default async function main() {
 
     game.update = () => {
         const eated = [];
+        // Проверка съеденной еды
         for (const food of foods) {
             if (haveCollision(pacman, food)) {
                 eated.push(food);
                 game.stage.remove(food);
-            };
-        };
+            }
+        }
         // оставляем ту еду, которую не съел pacman
         foods = foods.filter(food => !eated.includes(food));
-
-       changeDirection(pacman);
-
+        // смена направления pacman и ghost
+        changeDirection(pacman);
+        ghosts.forEach(changeDirection);
+       // проверка столновения ghost со стеной
+            for (const ghost of ghosts) {
+                const wall = getWallCollition(ghost.getNextPosition());
+                if (wall) {
+                    ghost.speedX = 0;
+                    ghost.speedY = 0;
+                    if (gh) {
+                        
+                    }
+                }
+            }
+        // проверка столновения pacmana со стеной
         const wall = getWallCollition(pacman.getNextPosition());
         if (wall) {
-            pacman.start(`wait${pacman.animation.name}`);s
+            pacman.start(`wait${pacman.animation.name}`);
             pacman.speedX = 0;
             pacman.speedY = 0;
 
-        } 
+        }
+ 
     };
 
     document.addEventListener('keydown', event => {
