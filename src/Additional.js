@@ -30,6 +30,7 @@ export function haveCollision (a, b) {
 
 }
 
-export function getRandomFrom(...aray) {
-    const index = Math.floor(Math.random() * aray.length);
+export function getRandomFrom(...array) {
+    const index = Math.floor(Math.random() * array.length);
+    return array[index];
 }

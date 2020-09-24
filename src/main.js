@@ -6,7 +6,7 @@ import {
 import Sprite from './Sprite.js';
 import Cinematic from './Cinematic.js';
 import {
-    haveCollision
+    haveCollision, getRandomFrom
 } from './Additional.js';
 import DisplayObject from './DisplayObject.js';
 
@@ -45,8 +45,8 @@ export default async function main() {
             ...food,
             x: food.x * scale,
             y: food.y * scale,
-            width: food.width * scale,
             height: food.height * scale,
+            width: food.width * scale,
         }))
 
         .map(food => new Sprite({
@@ -72,8 +72,8 @@ export default async function main() {
         .map(color => {
             const ghost = new Cinematic({
                 image,
-                y: atlas.position[color].y * scale,
                 x: atlas.position[color].x * scale,
+                y: atlas.position[color].y * scale,
                 width: 13 * scale,
                 height: 13 * scale,
                 // использование шаблон строк цвет + приведение
@@ -90,8 +90,8 @@ export default async function main() {
         // передача всех wall
         x: wall.x * scale,
         y: wall.y * scale,
-        width: wall.width * scale,
         height: wall.height * scale,
+        width: wall.width * scale,
         debug: true,
     }));
 
@@ -114,20 +114,41 @@ export default async function main() {
         }
         // оставляем ту еду, которую не съел pacman
         foods = foods.filter(food => !eated.includes(food));
+
         // смена направления pacman и ghost
         changeDirection(pacman);
         ghosts.forEach(changeDirection);
+
        // проверка столновения ghost со стеной
             for (const ghost of ghosts) {
                 const wall = getWallCollition(ghost.getNextPosition());
                 if (wall) {
                     ghost.speedX = 0;
-                    ghost.speedY = 0;
-                    if (gh) {
-                        
+                    ghost.speedY = 0;                  
+                }
+                if (ghost.speedX === 0 && ghost.speedY === 0) {
+                    
+                    if (ghost.animation.name === 'up') {
+                        ghost.nextDirection = getRandomFrom('left', 'right', 'down');
+                    } else if (ghost.animation.name === 'down') {
+                        ghost.nextDirection = getRandomFrom('left', 'right', 'up');
+                    } else if (ghost.animation.name === 'left') {
+                        ghost.nextDirection = getRandomFrom('down', 'right', 'up');
+                    } else if (ghost.animation.name === 'right') {
+                        ghost.nextDirection = getRandomFrom('left', 'down', 'up');
                     }
                 }
+                if (haveCollision(ghost, pacman)) {
+                    pacman.speedX = 0;
+                    pacman.speedY = 0;
+                    pacman.start('die', {
+                        OnEnd() {
+                           pacman.stop();
+                        }
+                    });
+                }
             }
+
         // проверка столновения pacmana со стеной
         const wall = getWallCollition(pacman.getNextPosition());
         if (wall) {
