@@ -1,6 +1,7 @@
 import DisplayObject from './DisplayObject.js'
 
 export default class Sprite extends DisplayObject {
+    play = true
     constructor(props = {}) {
         super(props);
 
@@ -10,7 +11,7 @@ export default class Sprite extends DisplayObject {
         this.speedX = props.speedX ?? 0;
         this.speedY = props.speedY ?? 0;
         this.nextDirection = null;
-    };
+    }
 
     getNextPosition() {
         return {
@@ -18,33 +19,35 @@ export default class Sprite extends DisplayObject {
             y: this.y + this.speedY,            
             height: this.height,
             width: this.width,
-        }
+        };
     }
 
 
     update () {
         this.x += this.speedX;
         this.y += this.speedY;
-    };
+    }
 
     draw (context) {
-        context.drawImage(
-            this.image,
-            
-            this.frame.x,
-            this.frame.y,
-            this.frame.width,
-            this.frame.height,
-
-            this.x,
-            this.y,
-            this.width,
-            this.height          
+        if (this.frame) {
+            context.drawImage(
+                this.image,
+                
+                this.frame.x,
+                this.frame.y,
+                this.frame.width,
+                this.frame.height,
     
-        );
+                this.x,
+                this.y,
+                this.width,
+                this.height       
+        
+            );
+        }        
 
         super.draw(context);
 
             
-    };
-};
+    }
+}

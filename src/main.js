@@ -95,6 +95,22 @@ export default async function main() {
         debug: true,
     }));
 
+    const leftPortal = new DisplayObject({
+        x: atlas.leftPortal.x * scale,
+        y: atlas.leftPortal.y * scale,
+        width: atlas.leftPortal.width * scale,
+        height: atlas.leftPortal.height * scale,
+        
+    });
+
+    const rightPortal = new DisplayObject({
+        x: atlas.rightPortal.x * scale,
+        y: atlas.rightPortal.y * scale,
+        width: atlas.rightPortal.width * scale,
+        height: atlas.rightPortal.height * scale,
+
+    });
+
 
     game.stage.add(maze);
     foods.forEach(food => game.stage.add(food));
@@ -138,12 +154,15 @@ export default async function main() {
                         ghost.nextDirection = getRandomFrom('left', 'down', 'up');
                     }
                 }
-                if (haveCollision(ghost, pacman)) {
+
+                if (pacman.play && haveCollision(pacman, ghost)) {
                     pacman.speedX = 0;
                     pacman.speedY = 0;
                     pacman.start('die', {
-                        OnEnd() {
-                           pacman.stop();
+                        onEnd() {
+                            pacman.play = false;
+                            pacman.stop();
+                            game.stage.remove(pacman);
                         }
                     });
                 }
@@ -161,6 +180,9 @@ export default async function main() {
     };
 
     document.addEventListener('keydown', event => {
+        if (!pacman.play) {
+            return;
+        }
         if (event.key === 'ArrowLeft') {
             pacman.nextDirection = 'left';
         } else if (event.key === 'ArrowRight') {
