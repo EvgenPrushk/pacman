@@ -83,6 +83,7 @@ export default async function main() {
             // позиция задает по цвету
             ghost.start(atlas.position[color].direction);
             ghost.nextDirection = atlas.position[color].direction;
+            ghost.isBlue = false;
             return ghost;
         });
 
@@ -100,7 +101,7 @@ export default async function main() {
         y: atlas.leftPortal.y * scale,
         width: atlas.leftPortal.width * scale,
         height: atlas.leftPortal.height * scale,
-        
+        debug: true
     });
 
     const rightPortal = new DisplayObject({
@@ -108,9 +109,18 @@ export default async function main() {
         y: atlas.rightPortal.y * scale,
         width: atlas.rightPortal.width * scale,
         height: atlas.rightPortal.height * scale,
-
+        debug: true,
     });
 
+    const tablets = atlas.position.tablets
+        .map(tablet => new Sprite({
+            image,
+            frame: atlas.tablet,
+            x: tablet.x * scale,
+            y: tablet.y * scale,
+            width: tablet.width * scale,
+            height: tablet.height * scale,
+        }));
 
     game.stage.add(maze);
     foods.forEach(food => game.stage.add(food));
@@ -118,6 +128,9 @@ export default async function main() {
     // вызов через массив
     ghosts.forEach(ghost => game.stage.add(ghost));
     walls.forEach(wall => game.stage.add(wall));
+    game.stage.add(leftPortal);
+    game.stage.add(rightPortal);
+    tablets.forEach(tablet => game.stage.add(tablet));
 
     game.update = () => {
         const eated = [];
@@ -135,38 +148,46 @@ export default async function main() {
         changeDirection(pacman);
         ghosts.forEach(changeDirection);
 
-       // проверка столновения ghost со стеной
-            for (const ghost of ghosts) {
-                const wall = getWallCollition(ghost.getNextPosition());
-                if (wall) {
-                    ghost.speedX = 0;
-                    ghost.speedY = 0;                  
-                }
-                if (ghost.speedX === 0 && ghost.speedY === 0) {
-                    
-                    if (ghost.animation.name === 'up') {
-                        ghost.nextDirection = getRandomFrom('left', 'right', 'down');
-                    } else if (ghost.animation.name === 'down') {
-                        ghost.nextDirection = getRandomFrom('left', 'right', 'up');
-                    } else if (ghost.animation.name === 'left') {
-                        ghost.nextDirection = getRandomFrom('down', 'right', 'up');
-                    } else if (ghost.animation.name === 'right') {
-                        ghost.nextDirection = getRandomFrom('left', 'down', 'up');
-                    }
-                }
+        // проверка столновения ghost со стеной
+        for (const ghost of ghosts) {
+            const wall = getWallCollition(ghost.getNextPosition());
+            if (wall) {
+                ghost.speedX = 0;
+                ghost.speedY = 0;
+            }
+            if (ghost.speedX === 0 && ghost.speedY === 0) {
 
-                if (pacman.play && haveCollision(pacman, ghost)) {
-                    pacman.speedX = 0;
-                    pacman.speedY = 0;
-                    pacman.start('die', {
-                        onEnd() {
-                            pacman.play = false;
-                            pacman.stop();
-                            game.stage.remove(pacman);
-                        }
-                    });
+                if (ghost.animation.name === 'up') {
+                    ghost.nextDirection = getRandomFrom('left', 'right', 'down');
+                } else if (ghost.animation.name === 'down') {
+                    ghost.nextDirection = getRandomFrom('left', 'right', 'up');
+                } else if (ghost.animation.name === 'left') {
+                    ghost.nextDirection = getRandomFrom('down', 'right', 'up');
+                } else if (ghost.animation.name === 'right') {
+                    ghost.nextDirection = getRandomFrom('left', 'down', 'up');
                 }
             }
+
+            if (pacman.play && ghost.play && haveCollision(pacman, ghost)) {
+                if (ghost.isBlue) {
+                    ghost.play = false;
+                    ghost.speedX = 0;
+                    ghost.speedY = 0;
+                    game.stage.remove(ghost);
+                }
+               else {
+                pacman.speedX = 0;
+                pacman.speedY = 0;
+                pacman.start('die', {
+                    onEnd() {
+                        pacman.play = false;
+                        pacman.stop();
+                        game.stage.remove(pacman);
+                    }
+                });
+               }
+            }
+        }
 
         // проверка столновения pacmana со стеной
         const wall = getWallCollition(pacman.getNextPosition());
@@ -176,7 +197,34 @@ export default async function main() {
             pacman.speedY = 0;
 
         }
- 
+
+        if (haveCollision(pacman, leftPortal)) {
+            pacman.x = atlas.rightPortal.x * scale - pacman.width;
+
+        }
+
+        if (haveCollision(pacman, rightPortal)) {
+            pacman.x = atlas.leftPortal.x * scale + pacman.width;
+
+        }
+
+        for (let i = 0; i < tablets.length; i++) {
+            const tablet = tablets[i];
+            if (haveCollision(pacman, tablet)) {
+                // удаление таблетки из массива таблет
+                tablets.splice(i, 1);
+                game.stage.remove(tablet);
+
+                ghosts.forEach(ghost => {
+                    ghost.animations = atlas.blueGhost;
+                    ghost.isBlue = true;
+                    ghost.start(ghost.animation.name);
+                })
+
+                break;
+            }
+        }
+
     };
 
     document.addEventListener('keydown', event => {
