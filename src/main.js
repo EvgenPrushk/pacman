@@ -150,6 +150,10 @@ export default async function main() {
 
         // проверка столновения ghost со стеной
         for (const ghost of ghosts) {
+            if (!ghost.play) {
+                return
+            };
+
             const wall = getWallCollition(ghost.getNextPosition());
             if (wall) {
                 ghost.speedX = 0;
@@ -216,11 +220,19 @@ export default async function main() {
                 game.stage.remove(tablet);
 
                 ghosts.forEach(ghost => {
+                    // оригиналыный цвет приведения
+                    ghost.originalAnimations = ghost.animations;
                     ghost.animations = atlas.blueGhost;
                     ghost.isBlue = true;
                     ghost.start(ghost.animation.name);
                 })
-
+                setTimeout(() => {
+                    ghosts.forEach(ghost => {
+                        ghost.animations = ghost.originalAnimations;
+                        ghost.isBlue = false;
+                        ghost.start(ghost.animation.name);
+                    })
+                }, 5000);
                 break;
             }
         }
