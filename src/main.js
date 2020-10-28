@@ -9,6 +9,7 @@ import {
     haveCollision, getRandomFrom
 } from './Additional.js';
 import DisplayObject from './DisplayObject.js';
+import Group from './Group.js';
 
 const scale = 3;
 
@@ -21,6 +22,10 @@ export default async function main() {
         background: 'black',
 
     })
+   const party = new Group()
+   
+   party.offsetY = 50;
+   game.stage.add(party);
 
     document.body.append(game.canvas);
 
@@ -122,15 +127,15 @@ export default async function main() {
             height: tablet.height * scale,
         }));
 
-    game.stage.add(maze);
-    foods.forEach(food => game.stage.add(food));
-    game.stage.add(pacman);
+    party.add(maze);
+    foods.forEach(food => party.add(food));
+    party.add(pacman);
     // вызов через массив
-    ghosts.forEach(ghost => game.stage.add(ghost));
-    walls.forEach(wall => game.stage.add(wall));
-    game.stage.add(leftPortal);
-    game.stage.add(rightPortal);
-    tablets.forEach(tablet => game.stage.add(tablet));
+    ghosts.forEach(ghost => party.add(ghost));
+    walls.forEach(wall => party.add(wall));
+    party.add(leftPortal);
+    party.add(rightPortal);
+    tablets.forEach(tablet => party.add(tablet));
 
     game.update = () => {
         const eated = [];
@@ -138,7 +143,7 @@ export default async function main() {
         for (const food of foods) {
             if (haveCollision(pacman, food)) {
                 eated.push(food);
-                game.stage.remove(food);
+                party.remove(food);
             }
         }
         // оставляем ту еду, которую не съел pacman
@@ -159,37 +164,40 @@ export default async function main() {
                 ghost.speedX = 0;
                 ghost.speedY = 0;
             }
-            if (ghost.speedX === 0 && ghost.speedY === 0) {
 
+            if ((ghost.speedX === 0 && ghost.speedY === 0) || Math.random() > 0.95) {
                 if (ghost.animation.name === 'up') {
-                    ghost.nextDirection = getRandomFrom('left', 'right', 'down');
+                    ghost.nextDirection = getRandomFrom('left', 'right');
                 } else if (ghost.animation.name === 'down') {
-                    ghost.nextDirection = getRandomFrom('left', 'right', 'up');
+                    ghost.nextDirection = getRandomFrom('left', 'right');
                 } else if (ghost.animation.name === 'left') {
-                    ghost.nextDirection = getRandomFrom('down', 'right', 'up');
+                    ghost.nextDirection = getRandomFrom('down', 'up');
                 } else if (ghost.animation.name === 'right') {
-                    ghost.nextDirection = getRandomFrom('left', 'down', 'up');
+                    ghost.nextDirection = getRandomFrom('down', 'up');
                 }
             }
 
+            // столкновение с ghost и проверка голубой ли ghost
             if (pacman.play && ghost.play && haveCollision(pacman, ghost)) {
                 if (ghost.isBlue) {
                     ghost.play = false;
                     ghost.speedX = 0;
                     ghost.speedY = 0;
-                    game.stage.remove(ghost);
+                    party.remove(ghost);
+                    // удаляем приведение из массива после его поедания
+                    ghosts.splice(ghosts.indexOf(ghosts), 1);
                 }
-               else {
-                pacman.speedX = 0;
-                pacman.speedY = 0;
-                pacman.start('die', {
-                    onEnd() {
-                        pacman.play = false;
-                        pacman.stop();
-                        game.stage.remove(pacman);
-                    }
-                });
-               }
+                else {
+                    pacman.speedX = 0;
+                    pacman.speedY = 0;
+                    pacman.start('die', {
+                        onEnd() {
+                            pacman.play = false;
+                            pacman.stop();
+                            party.remove(pacman);
+                        }
+                    });
+                }
             }
         }
 
@@ -199,25 +207,22 @@ export default async function main() {
             pacman.start(`wait${pacman.animation.name}`);
             pacman.speedX = 0;
             pacman.speedY = 0;
-
         }
-
+        //телепортация pacmans
         if (haveCollision(pacman, leftPortal)) {
             pacman.x = atlas.rightPortal.x * scale - pacman.width;
-
         }
 
         if (haveCollision(pacman, rightPortal)) {
             pacman.x = atlas.leftPortal.x * scale + pacman.width;
-
         }
-
+        // поедание таблеток
         for (let i = 0; i < tablets.length; i++) {
             const tablet = tablets[i];
             if (haveCollision(pacman, tablet)) {
                 // удаление таблетки из массива таблет
                 tablets.splice(i, 1);
-                game.stage.remove(tablet);
+                party.remove(tablet);
 
                 ghosts.forEach(ghost => {
                     // оригиналыный цвет приведения
@@ -236,7 +241,6 @@ export default async function main() {
                 break;
             }
         }
-
     };
 
     document.addEventListener('keydown', event => {
@@ -253,7 +257,6 @@ export default async function main() {
             pacman.nextDirection = 'down';
         }
     });
-
 
     function getWallCollition(obj) {
         for (const wall of walls) {
@@ -305,6 +308,5 @@ export default async function main() {
             }
             sprite.x -= 10;
         }
-
     }
 }
