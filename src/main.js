@@ -10,6 +10,7 @@ import {
 } from './Additional.js';
 import DisplayObject from './DisplayObject.js';
 import Group from './Group.js';
+import Text from './Text.js';
 
 const scale = 3;
 
@@ -18,7 +19,7 @@ const scale = 3;
 export default async function main() {
     const game = new Game({
         width: 672,
-        height: 644,
+        height: 800,
         background: 'black',
 
     })
@@ -26,6 +27,14 @@ export default async function main() {
    
    party.offsetY = 50;
    game.stage.add(party);
+
+   const state = new Text({
+    x: 250,
+    y: 100,
+    content: "0 очков",
+    fill: "red",
+   });
+   game.stage.add(state);
 
     document.body.append(game.canvas);
 
