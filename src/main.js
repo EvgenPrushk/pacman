@@ -22,19 +22,22 @@ export default async function main() {
         height: 800,
         background: 'black',
 
-    })
-   const party = new Group()
+    });
+
+   const party = new Group();
    
    party.offsetY = 50;
-   game.stage.add(party);
+   game.stage.add(party);   
 
-   const state = new Text({
-    x: 250,
-    y: 100,
+   const status = new Text({
+    x: game.canvas.width / 2,
+    y: 40,
     content: "0 очков",
-    fill: "red",
+    fill: 'white',
    });
-   game.stage.add(state);
+
+   status.points = 0;
+   game.stage.add(status);
 
     document.body.append(game.canvas);
 
@@ -153,6 +156,8 @@ export default async function main() {
             if (haveCollision(pacman, food)) {
                 eated.push(food);
                 party.remove(food);
+                status.points += 100;
+                status.content = `${status.points} очков`;
             }
         }
         // оставляем ту еду, которую не съел pacman
@@ -195,6 +200,8 @@ export default async function main() {
                     party.remove(ghost);
                     // удаляем приведение из массива после его поедания
                     ghosts.splice(ghosts.indexOf(ghosts), 1);
+                    status.points += 5000;
+                    status.content = `${status.points} очков`;
                 }
                 else {
                     pacman.speedX = 0;
@@ -206,7 +213,14 @@ export default async function main() {
                             party.remove(pacman);
                         }
                     });
-                }
+                }               
+            }
+            if (haveCollision(ghost, leftPortal)) {
+                ghost.x = atlas.rightPortal.x * scale - ghost.width - 1;
+            }
+    
+            if (haveCollision(ghost, rightPortal)) {
+                ghost.x = atlas.leftPortal.x * scale + ghost.width - 1;
             }
         }
 
@@ -219,11 +233,11 @@ export default async function main() {
         }
         //телепортация pacmans
         if (haveCollision(pacman, leftPortal)) {
-            pacman.x = atlas.rightPortal.x * scale - pacman.width;
+            pacman.x = atlas.rightPortal.x * scale - pacman.width - 1;
         }
 
         if (haveCollision(pacman, rightPortal)) {
-            pacman.x = atlas.leftPortal.x * scale + pacman.width;
+            pacman.x = atlas.leftPortal.x * scale + pacman.width - 1;
         }
         // поедание таблеток
         for (let i = 0; i < tablets.length; i++) {
