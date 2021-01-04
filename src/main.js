@@ -41,8 +41,8 @@ export default async function main() {
 
     document.body.append(game.canvas);
 
-    const image = await loadImage('/sets/spritesheet.png');
-    const atlas = await loadJSON('/sets/atlas.json');
+    const image = await loadImage('./sets/spritesheet.png');
+    const atlas = await loadJSON('./sets/atlas.json');
 
 
     const maze = new Sprite({
@@ -216,11 +216,11 @@ export default async function main() {
                 }               
             }
             if (haveCollision(ghost, leftPortal)) {
-                ghost.x = atlas.rightPortal.x * scale - ghost.width;
+                ghost.x = atlas.rightPortal.x * scale - ghost.width - 1;
             }
     
             if (haveCollision(ghost, rightPortal)) {
-                ghost.x = atlas.leftPortal.x * scale + ghost.width;
+                ghost.x = atlas.leftPortal.x * scale + ghost.width - 1;
             }
         }
 
@@ -233,11 +233,11 @@ export default async function main() {
         }
         //телепортация pacmans
         if (haveCollision(pacman, leftPortal)) {
-            pacman.x = atlas.rightPortal.x * scale - pacman.width;
+            pacman.x = atlas.rightPortal.x * scale - pacman.width - 1;
         }
 
         if (haveCollision(pacman, rightPortal)) {
-            pacman.x = atlas.leftPortal.x * scale + pacman.width;
+            pacman.x = atlas.leftPortal.x * scale + pacman.width - 1;
         }
         // поедание таблеток
         for (let i = 0; i < tablets.length; i++) {
